@@ -5,7 +5,7 @@
 
 #define INTERNAL_BUFFER_SIZE 100    // bytes
 
-#define DICT_MAX_N_OF_KEYVALUES 100
+#define DICT_MAX_N_OF_KEYVALUES 1
 #define IDENTIFIER_NAME_MAX_LENGTH 10   // overflow not handled!
 #define KEY_MAX_LENGTH 10               // overflow not handled!
 #define MAX_N_OF_DICTS 10               // overflow not handled!
@@ -290,10 +290,6 @@ Dict *get_dict(char * symbol, DictTable *dict_table) {
 }
 
 AssignKeyResult assign_key(char key[], int value, Dict *dict) {
-    if (dict->n_of_keys >= DICT_MAX_N_OF_KEYVALUES) {
-        printf("Max number of keys reached.\n");
-        return ASSIGN_KEY_MAX_REACHED;
-    }
     // First, check if key already assigned
     for (int i = 0; i < dict->n_of_keys; i++) {
         if (strcmp(key, dict->keyvalues[i]->key) == 0) {
@@ -301,12 +297,15 @@ AssignKeyResult assign_key(char key[], int value, Dict *dict) {
             return ASSIGN_KEY_SUCCESS;
         }
     }
+    if (dict->n_of_keys >= DICT_MAX_N_OF_KEYVALUES) {
+        printf("Max number of keys reached.\n");
+        return ASSIGN_KEY_MAX_REACHED;
+    }
     // Else append to dict
     KeyValue *kv = malloc(sizeof(KeyValue));
     kv->key = key;
     kv->value = value;
-    dict->keyvalues[dict->n_of_keys] = kv;
-    dict->n_of_keys++;
+    dict->keyvalues[dict->n_of_keys++] = kv;
 
     return ASSIGN_KEY_SUCCESS;
 }
